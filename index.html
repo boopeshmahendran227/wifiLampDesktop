@@ -1,0 +1,51 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stations Monitoring</title>
+    <style>
+      .traffic-light {
+        margin-left: 4px;
+      }
+      table {
+        width: 100%;
+        height: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #6f7180;
+      }
+      th {
+        font-size: 3.5rem;
+        font-weight: normal;
+      }
+      td {
+        font-size: 3rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body style="background-color: #171717; color: white">
+    <table>
+      <tr>
+        <td>
+          <table>
+            <tr style="color: red">
+              <th style="width: 20%">EMERGENCY CALL</th>
+              <td style="color: red">
+                <table style="color: red" id="redTable"></table>
+              </td>
+            </tr>
+            <tr style="color: yellow">
+              <th style="width: 20%">SUPERVISOR CALL</th>
+              <td style="color: yellow">
+                <table style="color: yellow" id="yellowTable"></table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <script src="./javascripts/lights.js"></script>
+  </body>
+</html>
