@@ -3,6 +3,7 @@ const debug = require("debug")("wifilamp:server");
 const http = require("http");
 const expressApp = require("./app");
 
+const port = 3000;
 expressApp.set("port", 3000);
 
 const server = http.createServer(expressApp);
@@ -11,6 +12,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1024,
     height: 676,
+    autoHideMenuBar: true,
   });
 
   win.loadFile("index.html");

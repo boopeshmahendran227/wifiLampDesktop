@@ -1,30 +1,15 @@
-console.log("javascript started");
-const lights = [{ ip: "192.168.1.50", name: "L0" }];
+const REQUEST_INTERVAL = 200;
 
-const REQUEST_INTERVAL = 5000;
-
-let currentReqMap = {};
 let lightStatusMap = {};
 
 function init() {
-  lights.forEach((l) => {
-    lightStatusMap[l.name] = {
-      redStatus: "0",
-      yellowStatus: "0",
-      greenStatus: "0",
-    };
-  });
-
-  // Start polling lights for status and update light status map
-  lights.forEach((l) => {
-    pollStatus(l);
-  });
+  pollStatus();
 
   // UI render loop
   renderUI();
   setInterval(() => {
     renderUI();
-  }, 2000);
+  }, 100);
 }
 
 const redTable = document.getElementById("redTable");
@@ -42,28 +27,25 @@ function renderUI() {
   renderTableUI(yellowLights, yellowTable);
 }
 
-function getNumColumns(l) {
-  if (l <= 4) {
-    return l;
-  }
-  return 5;
-}
-
 function renderTableUI(lights, element) {
-  const columnCount = getNumColumns(lights.length);
-  const rowCount = Math.ceil(lights.length / columnCount);
+  const rowCount = 2;
+  const columnCount = Math.max(3, Math.ceil(lights.length / rowCount));
 
   // clear element
   let index = 0;
   let content = "";
 
+  const maxLength = lights.reduce((a, b) => Math.max(a, b.length), 0);
+
   for (let i = 0; i < rowCount; ++i) {
     content += "<tr>";
     for (let j = 0; j < columnCount; ++j) {
       if (index < lights.length) {
-        content += `<td>${lights[index]}</td>`;
+        content += `<td><tt>${lights[index].toString().padStart(' ', maxLength)}</tt></td>`;
       } else {
-        content += "<td></td>";
+        content += `<td><tt style='opacity: 0'>${"1".repeat(
+          maxLength
+        )}</tt></td>`;
       }
       index++;
     }
@@ -73,16 +55,9 @@ function renderTableUI(lights, element) {
   element.innerHTML = content;
 }
 
-function pollStatus(l) {
-  const ip = l.ip;
-  const name = l.name;
-
+function pollStatus() {
   setInterval(function () {
-    if (currentReqMap[name]) {
-      return;
-    }
-
-    fetch(`http://localhost:3000/lights/status?ip=${ip}`)
+    fetch(`http://localhost:3000/lights/status`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("socket timedout");
@@ -90,14 +65,21 @@ function pollStatus(l) {
         return res.json();
       })
       .then((res) => {
-        lightStatusMap[name] = res;
-      })
-      .finally(() => {
-        currentReqMap[name] = 0;
+        lightStatusMap = res;
       });
-
-    currentReqMap[name] = 1;
   }, REQUEST_INTERVAL);
+}
+
+var dateTime = document.getElementById("dateTime");
+
+setInterval(() => {
+  dateTime.innerHTML = formatAMPM();
+}, 1000);
+
+
+function formatAMPM() {
+  var date = new Date();
+  return date.getDate().toString().padStart(2, '0') + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "<br/>" + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0') + ':' + date.getSeconds().toString().padStart(2, '0');
 }
 
 init();
